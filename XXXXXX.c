@@ -18,9 +18,9 @@ int main (int argc ,char ** argv)
 					printf("THIS IS %d CHILD PROCESS AND PID is %d,PPID is %d\n",i,getpid(),getppid());
 					exit(1);
 				}else if (pid < 0){
-					printf("ERROR:%d",errno);
+					printf("ERROR:%d\n",errno);
 				}else{
-					printf("THE PARENT IS PID [%d]\n",getpid());
+					printf("THE PARENT IS %d  PID [%d]\n" ,i ,getpid());
 				}
 		}
 #endif 
