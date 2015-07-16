@@ -4,10 +4,54 @@
 #include<errno.h>
 #include<stdlib.h>
 
+#include<signal.h>
+#include<sys/wait.h>
+#include<sys/types.h>
+
+void handle_child_death(int sign)
+{
+		pid_t pid;
+		int status;
+
+	/*	if ( (pid = waitpid(-1,&status,WNOHANG|WUNTRACED)) > 0 ){
+				printf("CHILD [%d] IS KILLED\n",pid);
+
+				if (WIFEXITED(status)) {
+						printf("exited, status=%d\n", WEXITSTATUS(status));
+				} else if (WIFSIGNALED(status)) {
+						printf("killed by signal %d\n", WTERMSIG(status));
+				} else if (WIFSTOPPED(status)) {
+						printf("stopped by signal %d\n", WSTOPSIG(status));
+				}
+		}else if (pid < 0 ){
+				perror("waitpid");
+		}
+	*/
+		do {
+			pid = waitpid(-1, &status, 0);
+			if (pid == -1) {
+				perror("waitpid");
+				exit(EXIT_FAILURE);
+			}
+
+			if (WIFEXITED(status)) {
+				printf("exited, status=%d\n", WEXITSTATUS(status));
+			} else if (WIFSIGNALED(status)) {
+				printf("killed by signal %d\n", WTERMSIG(status));
+			} else if (WIFSTOPPED(status)) {
+				printf("stopped by signal %d\n", WSTOPSIG(status));
+			} else if (WIFCONTINUED(status)) {
+				printf("continued\n");
+			}
+		} while (!WIFEXITED(status));
+
+}
+
 #define PROCESSNUM     10
 
 int main (int argc ,char ** argv)
 {
+		signal(SIGCHLD,handle_child_death);
 #if 1 
 		pid_t pid;
 		int i;
