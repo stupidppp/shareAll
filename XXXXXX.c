@@ -27,24 +27,14 @@ void handle_child_death(int sign)
 				perror("waitpid");
 		}
 	*/
-		do {
-			pid = waitpid(-1, &status, 0);
-			if (pid == -1) {
-				perror("waitpid");
-				exit(EXIT_FAILURE);
-			}
-
+		while ((pid= waitpid(-1,&status,WNOHANG|WUNTRACED))>0) {
+		
 			if (WIFEXITED(status)) {
 				printf("exited, status=%d\n", WEXITSTATUS(status));
 			} else if (WIFSIGNALED(status)) {
 				printf("killed by signal %d\n", WTERMSIG(status));
-			} else if (WIFSTOPPED(status)) {
-				printf("stopped by signal %d\n", WSTOPSIG(status));
-			} else if (WIFCONTINUED(status)) {
-				printf("continued\n");
-			}
-		} while (!WIFEXITED(status));
-
+			} 
+		}
 }
 
 #define PROCESSNUM     10
